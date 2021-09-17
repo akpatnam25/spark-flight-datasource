@@ -40,11 +40,13 @@ public class FlightSourceParams implements Serializable {
   private List<String> localityInfo;
   private String partitioningColumn;
   private String descriptor;
+  private long numPartitions;
 
   public FlightSourceParams(FlightSourceParamsBuilder builder) {
     this.localityInfo = builder.localityInfo;
     this.partitioningColumn = builder.partitioningColumn;
     this.descriptor = builder.descriptor;
+    this.numPartitions = builder.numPartitions;
     this.builder = builder;
   }
 
@@ -60,10 +62,13 @@ public class FlightSourceParams implements Serializable {
     return descriptor;
   }
 
+  public long getNumPartitions() { return numPartitions; }
+
   public static class FlightSourceParamsBuilder implements Serializable {
     private List<String> localityInfo;
     private String partitioningColumn;
     private String descriptor;
+    private long numPartitions;
 
     public FlightSourceParamsBuilder setLocalityInfo(List<String> localityInfo) {
       this.localityInfo = localityInfo;
@@ -77,6 +82,11 @@ public class FlightSourceParams implements Serializable {
 
     public FlightSourceParamsBuilder setDescriptor(String descriptor) {
       this.descriptor = descriptor;
+      return this;
+    }
+
+    public FlightSourceParamsBuilder setNumPartitions(long numPartitions) {
+      this.numPartitions = numPartitions;
       return this;
     }
 

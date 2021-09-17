@@ -29,8 +29,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.linkedin.sparkflightdatasource;
+package com.linkedin.sparkflightdatasource.read;
 
+import com.linkedin.sparkflightdatasource.FlightSourceParams;
 import org.apache.spark.sql.connector.read.Batch;
 import org.apache.spark.sql.connector.read.InputPartition;
 import org.apache.spark.sql.connector.read.PartitionReaderFactory;

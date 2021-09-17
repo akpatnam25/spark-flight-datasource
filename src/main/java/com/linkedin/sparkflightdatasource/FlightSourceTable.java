@@ -31,6 +31,8 @@
  */
 package com.linkedin.sparkflightdatasource;
 
+import com.linkedin.sparkflightdatasource.read.FlightSourceScanBuilder;
+import com.linkedin.sparkflightdatasource.write.FlightSourceWriterBuilder;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.spark.sql.connector.catalog.SupportsRead;
@@ -60,7 +62,7 @@ public class FlightSourceTable implements SupportsRead, SupportsWrite {
 
   @Override
   public WriteBuilder newWriteBuilder(LogicalWriteInfo info) {
-    return null;
+    return new FlightSourceWriterBuilder(info);
   }
 
   @Override

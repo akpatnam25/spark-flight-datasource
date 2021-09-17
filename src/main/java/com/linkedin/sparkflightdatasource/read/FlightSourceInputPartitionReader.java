@@ -29,10 +29,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.linkedin.sparkflightdatasource;
+package com.linkedin.sparkflightdatasource.read;
 
+import com.linkedin.sparkflightdatasource.FlightArrowColumnVector;
+import com.linkedin.sparkflightdatasource.FlightSourceParams;
+import com.linkedin.sparkflightdatasource.read.FlightSourceInputPartition;
 import java.io.IOException;
-import java.util.List;
 import org.apache.arrow.flight.FlightDescriptor;
 import org.apache.arrow.flight.FlightEndpoint;
 import org.apache.arrow.flight.FlightInfo;
@@ -40,7 +42,6 @@ import org.apache.spark.sql.connector.read.PartitionReader;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.sql.vectorized.ColumnVector;
 import org.apache.spark.sql.vectorized.ColumnarBatch;
-import org.apache.arrow.flight.Action;
 import org.apache.arrow.flight.FlightClient;
 import org.apache.arrow.flight.FlightStream;
 import org.apache.arrow.flight.Location;
