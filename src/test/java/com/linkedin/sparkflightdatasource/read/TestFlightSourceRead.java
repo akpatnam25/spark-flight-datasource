@@ -29,15 +29,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package read;
+package com.linkedin.sparkflightdatasource.read;
 
 import com.linkedin.sparkflightdatasource.Constants;
+import com.linkedin.sparkflightdatasource.FlightSource;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 
 
-public class TestFlightSource {
+public class TestFlightSourceRead {
 
   public static void main(String [] args) {
     SparkSession sparkSession = SparkSession.builder()
@@ -45,15 +50,26 @@ public class TestFlightSource {
         .master("local[*]")
         .getOrCreate();
 
+    StructField age = new StructField("age", DataTypes.StringType, true, Metadata.empty());
+    StructField first = new StructField("first", DataTypes.StringType, true, Metadata.empty());
+    StructField last = new StructField("last", DataTypes.StringType, true, Metadata.empty());
+    StructField company = new StructField("company", DataTypes.StringType, true, Metadata.empty());
+
+    StructType schema = new StructType(new StructField[]{age, first, last, company});
+
+
     Dataset<Row> dataset = sparkSession.read()
-        .format("com.linkedin.sparkflightdatasource.FlightSource")
+        .format(FlightSource.class.getCanonicalName())
+        .schema(schema)
         .option(Constants.DESCRIPTOR, "spark-flight-descriptor")
         .option(Constants.LOCALITY_INFO, "localhost:9002,localhost:9004")
         .option(Constants.PARTITIONING_COLUMN, "doesnt_matter")
+        .option(Constants.NUM_PARTITIONS, "0")
         .load();
+    System.out.println("Before show..");
     dataset.show();;
-    System.out.println(dataset.count());
-    System.out.println(dataset.rdd().getNumPartitions());
+    System.out.println("DatasetCount: " + dataset.count());
+    System.out.println("DatasetNumPartitions: " + dataset.rdd().getNumPartitions());
   }
 
 

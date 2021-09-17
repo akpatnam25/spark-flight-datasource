@@ -36,4 +36,5 @@ public interface Constants {
   String DESCRIPTOR = "descriptor";
   String PARTITIONING_COLUMN = "partitioning_column";
   String SCHEMA = "schema";
+  String NUM_PARTITIONS = "num_partitions";
 }

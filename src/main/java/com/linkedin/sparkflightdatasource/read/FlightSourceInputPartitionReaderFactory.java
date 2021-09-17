@@ -29,25 +29,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.linkedin.sparkflightdatasource;
+package com.linkedin.sparkflightdatasource.read;
 
-import org.apache.spark.sql.connector.read.Scan;
-import org.apache.spark.sql.connector.read.ScanBuilder;
+import com.linkedin.sparkflightdatasource.FlightSourceParams;
+import com.linkedin.sparkflightdatasource.read.FlightSourceInputPartition;
+import com.linkedin.sparkflightdatasource.read.FlightSourceInputPartitionReader;
+import org.apache.spark.sql.catalyst.InternalRow;
+import org.apache.spark.sql.connector.read.InputPartition;
+import org.apache.spark.sql.connector.read.PartitionReader;
+import org.apache.spark.sql.connector.read.PartitionReaderFactory;
 import org.apache.spark.sql.types.StructType;
+import org.apache.spark.sql.vectorized.ColumnarBatch;
 
 
-public class FlightSourceScanBuilder implements ScanBuilder {
+public class FlightSourceInputPartitionReaderFactory implements PartitionReaderFactory {
 
   private final StructType schema;
-  private FlightSourceParams params;
+  private final FlightSourceParams params;
 
-  public FlightSourceScanBuilder(StructType schema, FlightSourceParams params) {
+  public FlightSourceInputPartitionReaderFactory(StructType schema, FlightSourceParams params) {
     this.schema = schema;
     this.params = params;
   }
 
   @Override
-  public Scan build() {
-    return new FlightSourceScan(schema, params);
+  public PartitionReader<InternalRow> createReader(InputPartition partition) {
+    return null;
+  }
+
+  @Override
+  public PartitionReader<ColumnarBatch> createColumnarReader(InputPartition partition) {
+    return new FlightSourceInputPartitionReader((FlightSourceInputPartition) partition, schema, params);
+  }
+
+  @Override
+  public boolean supportColumnarReads(InputPartition partition) {
+    return true;
   }
 }

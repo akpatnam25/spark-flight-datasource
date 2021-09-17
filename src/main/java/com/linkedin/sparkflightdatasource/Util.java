@@ -42,6 +42,7 @@ public class Util {
         .setDescriptor(options.get(Constants.DESCRIPTOR))
         .setPartitioningColumn(options.get(Constants.PARTITIONING_COLUMN))
         .setLocalityInfo(getLocalityInfo(options))
+        .setNumPartitions(Long.parseLong(options.get(Constants.NUM_PARTITIONS)))
         .build();
     return flightParams;
   }

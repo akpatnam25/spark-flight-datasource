@@ -29,20 +29,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.linkedin.sparkflightdatasource;
+package com.linkedin.sparkflightdatasource.read;
 
-import org.apache.spark.sql.connector.read.InputPartition;
+import com.linkedin.sparkflightdatasource.FlightSourceParams;
+import com.linkedin.sparkflightdatasource.read.FlightSourceScan;
+import org.apache.spark.sql.connector.read.Scan;
+import org.apache.spark.sql.connector.read.ScanBuilder;
+import org.apache.spark.sql.types.StructType;
 
 
-public class FlightSourceInputPartition implements InputPartition {
+public class FlightSourceScanBuilder implements ScanBuilder {
 
-  private String location;
+  private final StructType schema;
+  private FlightSourceParams params;
 
-  public FlightSourceInputPartition(String location) {
-    this.location = location;
+  public FlightSourceScanBuilder(StructType schema, FlightSourceParams params) {
+    this.schema = schema;
+    this.params = params;
   }
 
-  public String[] preferredLocations() {
-    return new String[]{location};
+  @Override
+  public Scan build() {
+    return new FlightSourceScan(schema, params);
   }
 }

@@ -29,38 +29,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.linkedin.sparkflightdatasource;
+package com.linkedin.sparkflightdatasource.read;
 
-import org.apache.spark.sql.catalyst.InternalRow;
 import org.apache.spark.sql.connector.read.InputPartition;
-import org.apache.spark.sql.connector.read.PartitionReader;
-import org.apache.spark.sql.connector.read.PartitionReaderFactory;
-import org.apache.spark.sql.types.StructType;
-import org.apache.spark.sql.vectorized.ColumnarBatch;
 
 
-public class FlightSourceInputPartitionReaderFactory implements PartitionReaderFactory {
+public class FlightSourceInputPartition implements InputPartition {
 
-  private final StructType schema;
-  private final FlightSourceParams params;
+  private String location;
 
-  public FlightSourceInputPartitionReaderFactory(StructType schema, FlightSourceParams params) {
-    this.schema = schema;
-    this.params = params;
+  public FlightSourceInputPartition(String location) {
+    this.location = location;
   }
 
-  @Override
-  public PartitionReader<InternalRow> createReader(InputPartition partition) {
-    return null;
-  }
-
-  @Override
-  public PartitionReader<ColumnarBatch> createColumnarReader(InputPartition partition) {
-    return new FlightSourceInputPartitionReader((FlightSourceInputPartition) partition, schema, params);
-  }
-
-  @Override
-  public boolean supportColumnarReads(InputPartition partition) {
-    return true;
+  public String[] preferredLocations() {
+    return new String[]{location};
   }
 }
