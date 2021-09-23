@@ -33,10 +33,12 @@
 package com.linkedin.sparkflightdatasource
 
 import org.apache.arrow.memory.RootAllocator
+import org.apache.arrow.vector.VectorSchemaRoot
 import org.apache.arrow.vector.types.pojo.{ArrowType, Field, FieldType, Schema}
 import org.apache.arrow.vector.types.{DateUnit, FloatingPointPrecision, TimeUnit}
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types._
+
 import scala.collection.JavaConverters._
 
 /**
@@ -44,7 +46,11 @@ import scala.collection.JavaConverters._
  */
 object FlightArrowUtils {
 
-  val rootAllocator = new RootAllocator(Long.MaxValue)
+//  val rootAllocator = new RootAllocator(Long.MaxValue)
+//
+////  var schema: Schema = _
+////  def setSchema(schema: Schema) = this.schema = schema
+//  val root = VectorSchemaRoot.create(null, rootAllocator)
 
   // todo: support more types.
 

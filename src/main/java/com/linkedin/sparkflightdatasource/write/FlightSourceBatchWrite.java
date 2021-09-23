@@ -22,6 +22,7 @@ public class FlightSourceBatchWrite implements BatchWrite {
   @Override
   public DataWriterFactory createBatchWriterFactory(PhysicalWriteInfo info) {
     return new FlightSourceDataWriterFactory(logicalWriteInfo.schema(), params);
+
   }
 
   @Override
