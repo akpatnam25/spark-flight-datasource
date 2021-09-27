@@ -33,11 +33,16 @@ package com.linkedin.sparkflightdatasource.read;
 
 import com.linkedin.sparkflightdatasource.FlightArrowColumnVector;
 import com.linkedin.sparkflightdatasource.FlightSourceParams;
+import com.linkedin.sparkflightdatasource.FlightStreamUtils;
 import com.linkedin.sparkflightdatasource.read.FlightSourceInputPartition;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.arrow.flight.FlightDescriptor;
 import org.apache.arrow.flight.FlightEndpoint;
 import org.apache.arrow.flight.FlightInfo;
+import org.apache.arrow.vector.FieldVector;
 import org.apache.spark.sql.connector.read.PartitionReader;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.sql.vectorized.ColumnVector;
@@ -58,12 +63,12 @@ public class FlightSourceInputPartitionReader implements PartitionReader<Columna
   private final StructType schema;
 
   private FlightClient client;
-  private FlightStream stream;
+  private List<FlightStream> streams;
   private BufferAllocator allocator;
   private FlightDescriptor flightDescriptor;
   private FlightInfo flightInfo;
   private Location location;
-  private Ticket ticket;
+  private List<Ticket> tickets;
 
   public FlightSourceInputPartitionReader(FlightSourceInputPartition inputPartition, StructType schema, FlightSourceParams params) {
     this.inputPartition = inputPartition;
@@ -85,15 +90,16 @@ public class FlightSourceInputPartitionReader implements PartitionReader<Columna
     this.flightDescriptor = FlightDescriptor.path(params.getDescriptor());
     this.flightInfo = client.getInfo(flightDescriptor);
     System.out.println("FlightInfo get endpoints size: " + flightInfo.getEndpoints().size());
-    FlightEndpoint endpoint = flightInfo.getEndpoints().get(0);
-    this.ticket = endpoint.getTicket();
-    this.stream = client.getStream(ticket);
+    List<FlightEndpoint> endpoints = flightInfo.getEndpoints();
+    this.tickets = endpoints.stream().map(FlightEndpoint::getTicket).collect(Collectors.toList());
+    this.streams = this.tickets.stream().map(t -> client.getStream(t)).collect(Collectors.toList());
   }
 
   @Override
   public boolean next() throws IOException {
+
     try {
-      return stream.next();
+      return FlightStreamUtils.streamNexts(streams);
     } catch (Throwable t) {
       throw new IOException(t);
     }
@@ -101,23 +107,35 @@ public class FlightSourceInputPartitionReader implements PartitionReader<Columna
 
   @Override
   public ColumnarBatch get() {
+//    ColumnarBatch batch = new ColumnarBatch(
+//        stream.getRoot().getFieldVectors()
+//            .stream()
+//            .map(FlightArrowColumnVector::new)
+//            .toArray(ColumnVector[]::new)
+//    );
+//    batch.setNumRows(stream.getRoot().getRowCount());
+    FieldVector[] fieldVectors = FlightStreamUtils.streamsToFieldVectors(this.streams);
+    //allocator.close();
     ColumnarBatch batch = new ColumnarBatch(
-        stream.getRoot().getFieldVectors()
-            .stream()
+        Arrays.stream(fieldVectors)
             .map(FlightArrowColumnVector::new)
             .toArray(ColumnVector[]::new)
     );
-    batch.setNumRows(stream.getRoot().getRowCount());
+    batch.setNumRows(FlightStreamUtils.totalRowCount());
     return batch;
   }
 
   @Override
   public void close() throws IOException {
-    try {
-      AutoCloseables.close(stream, client, allocator);
-      allocator.close();
-    } catch (Exception e) {
-      throw new IOException(e);
-    }
+//    try {
+//      AutoCloseables.close(client, allocator);
+//      for (FlightStream s : streams) {
+//        AutoCloseables.close(s);
+//      }
+//      allocator.close();
+//      client.close();
+//    } catch (Exception e) {
+//      throw new IOException(e);
+//    }
   }
 }
